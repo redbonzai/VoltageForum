@@ -20,7 +20,11 @@ class AppServiceProvider extends ServiceProvider
         URL::forceScheme('https');
         Schema::defaultStringLength(191);
 
-        View::share('channels', Channel::all());
+       // View::share('channels', Channel::all());
+
+        \View::composer('*', function($view) {
+            $view->with('channels', Channel::all());
+        });
     }
 
     /**
