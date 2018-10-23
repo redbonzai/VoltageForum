@@ -68,7 +68,7 @@ class ReadThreadsTest extends TestCase
 
     public function a_user_can_filter_threads_by_any_username()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create(['name' => 'Nakamichi']);
         $this->signIn($user);
 
         $threadByNakamichi = factory(Thread::class)->create(['user_id' => auth()->id()]);
@@ -78,5 +78,7 @@ class ReadThreadsTest extends TestCase
             ->assertSee($threadByNakamichi)
             ->assertDontSee($threadNotByNakamichi);
     }
+
+
 
 }

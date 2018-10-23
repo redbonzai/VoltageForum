@@ -24,28 +24,15 @@ class ParticipateInForumTest extends TestCase
     function an_authenticated_user_participates_in_forum_threads()
     {
         //Given an authenticated user
-        $user = User::latest()->first();
+        $this->signIn();
 
-        //login the user
-        $this->be($user);
+        $thread = factory('App\Models\Thread')->create();
+        $reply = factory('App\Models\Reply')->make();
 
-        //and an existing thread.
-        $thread = factory(Thread::class)->create(['user_id' => $user->id]);
-       // $thread = Thread::where('user_id', '=', $user->id)->first();
+        $this->post($thread->path() . '/replies', $reply->toArray());
 
-        //When the user adds a reply to the thread.
-        $reply = factory(Reply::class)->make([
-            'user_id' => $user->id,
-            'thread_id' => $thread->id,
-            'body' => 'this is a test',
-            'created_by' => $user->name,
-            'updated_by' => $user->name
-        ]);
-
-        //then their reply should be visible on the page.
-        $this->post($thread->path().'/replies', $reply->toArray() );
-
-        $this->get($thread->path())->assertSee($reply->body);
+        $this->get($thread->path())
+            ->assertSee($reply->body);
     }
 
     /** @test */

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel;
 use App\Models\Thread;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Filters\ThreadFilters;
+use Illuminate\Support\Facades\DB;
 
 class ThreadController extends Controller
 {
@@ -14,20 +17,21 @@ class ThreadController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Channel $channel
+     * @param ThreadFilters $filters
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(Channel $channel)
+    public function index(Channel $channel, ThreadFilters $filters)
     {
-        $threads = Thread::latest()->get();
+       if ($channel->exists) {
+           $threads = $channel->threads()->latest();
+       } else {
+           $threads = Thread::latest();
+       }
 
-        if ($channel->exists) {
-//            $channelId = Channel::where('slug', $channelSlug)->first()->id;
-//
-//            $threads = Thread::where('channel_id', $channelId)->latest()->get();
-            $threads = $channel->threads()->latest()->get();
-        }
+        $threads = Thread::filter($filters)->get();
+
+        $replyCount = $this->getThreads($channel);
 
         return view('threads.index', ['threads' => $threads]);
     }
@@ -111,4 +115,29 @@ class ThreadController extends Controller
     {
         //
     }
+
+    /**
+     * @param Channel $channel
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    protected function getThreads(Channel $channel)
+    {
+        if ($channel->exists) {
+            $threads = $channel->threads()->latest();
+
+        } else {
+            $threads = Thread::latest();
+        }
+        // if request('by'), we should filter by the given username.
+        if ($username = request('by')) {
+
+            $user = User::where('name', '=', trim($username))->first();
+            $threads->where('user_id', $user->id);
+        }
+
+        $threads = $threads->get();
+        return $threads;
+    }
+
+
 }
