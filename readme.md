@@ -43,6 +43,10 @@ Then compile all assets :
 ```php
 npm run dev 
 ```
+Migrate the database and seed with testing content
+```php
+php artisan migrate --seed
+```
 
 Start up the server with `php artisan server`
 
