@@ -21,6 +21,11 @@ class Thread extends Model
         'updated_by' => 'string'
     ];
 
+    public function scopeFilter($query, $filters)
+    {
+        return $filters->apply($query);
+    }
+
     public function addReply($reply)
     {
         $this->replies()->create($reply);
