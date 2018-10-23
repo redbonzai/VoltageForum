@@ -7,6 +7,7 @@ use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Filters\ThreadFilters;
+use Illuminate\Support\Facades\DB;
 
 class ThreadController extends Controller
 {
@@ -30,7 +31,7 @@ class ThreadController extends Controller
 
         $threads = Thread::filter($filters)->get();
 
-       // $threads = $this->getThreads($channel);
+        $replyCount = $this->getThreads($channel);
 
         return view('threads.index', ['threads' => $threads]);
     }
@@ -137,4 +138,6 @@ class ThreadController extends Controller
         $threads = $threads->get();
         return $threads;
     }
+
+
 }
